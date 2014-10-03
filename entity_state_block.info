@@ -1,0 +1,7 @@
+name = Entity state block
+description = Provides a block describing the state of the currently viewed entity.
+core = 7.x
+
+configure = admin/structure/block/manage/entity_state_block/entity_state_block/configure
+
+dependencies[] = block

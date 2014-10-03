@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function entity_state_block_install() {
+  if ($role = user_role_load_by_name('administrator')) {
+    db_insert('block_role')
+      ->fields(array(
+        'module' => 'entity_state_block',
+        'delta' => 'entity_state_block',
+        'rid' => $role->rid,
+      ))
+      ->execute();
+  }
+  else {
+    $url = url('admin/structure/block/manage/entity_state_block/entity_state_block/configure', array(
+      'absolute' => TRUE,
+    ));
+    drupal_set_message(t('The "Entity state block" module was not able to find administrator role. Block will be invisible until at least one role is set at !link', array(
+      '!link' => l($url, $url),
+    )), 'warning');
+  }
+}
+
+/**
+ * Implements hook_block_uninstall().
+ */
+function entity_state_block_uninstall() {
+  db_delete('variable')
+    ->condition('name', db_like('entity_state_block_') . '%', 'LIKE')
+    ->execute();
+}

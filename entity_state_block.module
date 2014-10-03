@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * @file
+ * The module shows block providing currently viewed entity state information.
+ */
+
+/**
+ * Implements hook_block_info().
+ */
+function entity_state_block_block_info() {
+  return array(
+    'entity_state_block' => array(
+      'info' => t('Entity state'),
+      // @todo: check if we may use some cache and clear it on entity
+      // update/delete hooks (also consider domain_variants, entitycache, etc.)
+      'cache' => DRUPAL_NO_CACHE,
+      'weight' => -100,
+      'status' => 1,
+      'region' => 'content',
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function entity_state_block_block_configure($delta = '') {
+  $form = array();
+  if ($delta == 'entity_state_block') {
+    module_load_include('inc', 'entity_state_block');
+    $form = _entity_state_block_configure_form($form);
+  }
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function entity_state_block_block_save($delta = '', $edit = array()) {
+  if ($delta == 'entity_state_block') {
+    variable_set('entity_state_block_settings', $edit['main']);
+  }
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function entity_state_block_block_view($delta = '') {
+  $block = array();
+  if ($delta == 'entity_state_block') {
+    module_load_include('inc', 'entity_state_block');
+    if (_entity_state_block_roles_assigned()) {
+      list($entity_type, $entity) = _entity_state_block_get_currently_viewed_entity();
+      if ($entity) {
+        $content = _entity_state_block_get_entity_state($entity_type, $entity);
+        if ($content) {
+          $block['subject'] = t('Entity state');
+          $block['content'] = $content;
+        }
+      }
+    }
+  }
+  return $block;
+}
