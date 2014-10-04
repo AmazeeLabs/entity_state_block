@@ -100,3 +100,74 @@ if (!function_exists('domain_entity_state_block_view')) {
     return $return;
   }
 }
+
+if (!function_exists('panelizer_entity_state_block_info')) {
+
+  /**
+   * Implements hook_entity_state_block_info().
+   */
+  function panelizer_entity_state_block_info() {
+    return array(
+      'node' => array(
+        'panelizer' => array(
+          'title' => t('Panelizer'),
+          'description' => t('Overall panelizer state for the current entity and/or current state of the "Full page override" (page_manager) view mode.'),
+        ),
+      ),
+    );
+  }
+
+}
+if (!function_exists('panelizer_entity_state_block_view')) {
+
+  /**
+   * Implements hook_entity_state_block_view().
+   */
+  function panelizer_entity_state_block_view($entity_type, $entity, $enabled_sections) {
+    $return = array();
+    if (in_array('panelizer', $enabled_sections)) {
+      $enabled = FALSE;
+      //
+      $overview = panelizer_entity_plugin_switcher_page($entity_type, 'overview', $entity);
+      if ($overview) {
+        $doc = new DOMDocument();
+        $doc->loadHTML($overview);
+        $tr = $doc->getElementsByTagName('tr');
+        /* @var DOMNode $row */
+        foreach ($tr as $index => $row) {
+          // View mode name.
+          $cell = $row->firstChild;
+          if ($cell->textContent == t('Full page override')) {
+            // Status.
+            $cell = $cell->nextSibling;
+            $status = $cell->textContent;
+            // Operations.
+            $cell = $cell->nextSibling;
+            // UL tag.
+            $cell = $cell->firstChild;
+            $operations = array();
+            /* @var DOMNode $li */
+            foreach ($cell->childNodes as $li) {
+              if ($li->nodeName == 'li') {
+                $operations[] = $li->ownerDocument->saveHTML($li->firstChild);
+              }
+            }
+            $enabled = TRUE;
+            break;
+          }
+        }
+      }
+      if ($enabled) {
+        $value = t('Status') . ': ' . $status . '<br />' . t('Operations') . ': ' . implode(', ', $operations);
+      }
+      else {
+        $value = t('Disabled');
+      }
+      $return['panelizer'] = array(
+        'title' => t('Panelizer'),
+        'value' => $value,
+      );
+    }
+    return $return;
+  }
+}
