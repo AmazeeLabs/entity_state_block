@@ -1,0 +1,16 @@
+/**
+ * Basic styles for the block.
+ */
+table.entity-state-block {
+  border-collapse:collapse;
+  border: 1px solid #ed5;
+}
+table.entity-state-block tr td {
+  text-align: left;
+  padding: 5pt;
+  background-color: #fffce5;
+  border: 1px solid #ed5;
+}
+.entity-state-block td:first-child {
+  white-space: nowrap;
+}
