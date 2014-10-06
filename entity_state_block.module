@@ -39,7 +39,7 @@ function entity_state_block_block_configure($delta = '') {
  */
 function entity_state_block_block_save($delta = '', $edit = array()) {
   if ($delta == 'entity_state_block') {
-    variable_set('entity_state_block_settings', $edit['main']);
+    variable_set('entity_state_block_settings', $edit['configuration']);
   }
 }
 

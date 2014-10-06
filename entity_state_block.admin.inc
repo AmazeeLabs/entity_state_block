@@ -1,5 +1,7 @@
 <?php
 
+//AXXX add "more" divider
+
 /**
  * Builds block configuration form.
  *
@@ -12,58 +14,43 @@ function _entity_state_block_configure_form($form) {
   if (!_entity_state_block_roles_assigned() && empty($_POST)) {
     drupal_set_message(t('No roles are currently assigned to the block. No one is able to see the block. Please check the "Roles" vertical tab.'), 'warning', FALSE);
   }
-  $entity_state_info = _entity_state_block_get_info();
-  $entity_info = entity_get_info();
-  $form['main'] = array(
+  $weight_class = drupal_html_class('weight');
+  $form['configuration'] = array(
     '#type' => 'fieldset',
-    '#title' => t('View configuration by entity type'),
-    '#collapsible' => FALSE,
+    '#title' => t('Configuration'),
+    '#collapsible' => TRUE,
     '#collapsed' => FALSE,
     '#tree' => TRUE,
+    '#pre_render' => array('entity_state_block_configure_form_pre_render'),
+    '#table_header' => array(
+      'enabled' => t('Enabled'),
+      'title' => t('Title'),
+      'description' => t('Description'),
+      'weight' => t('Weight'),
+    ),
+    '#weight_class' => $weight_class,
   );
-  $table_header = array(
-    'enabled' => t('Enabled'),
-    'title' => t('Title'),
-    'description' => t('Description'),
-    'weight' => t('Weight'),
-  );
-  foreach ($entity_state_info as $entity_type => $sections) {
-    if (isset($entity_info[$entity_type]['label']) && !empty($sections)) {
-      $weight_class = drupal_html_class('weight-' . $entity_type);
-      $form['main'][$entity_type] = array(
-        '#type' => 'fieldset',
-        '#title' => $entity_info[$entity_type]['label'],
-        '#collapsible' => TRUE,
-        '#collapsed' => FALSE,
-        '#tree' => TRUE,
-        '#pre_render' => array('entity_state_block_configure_form_pre_render'),
-        '#table_header' => $table_header,
-        '#entity_type' => $entity_type,
-        '#weight_class' => $weight_class,
-      );
-      foreach ($sections as $section_key => $section) {
-        $form['main'][$entity_type][$section_key]['#entity_state'] = $section;
-        $form['main'][$entity_type][$section_key]['#weight_class'] = $weight_class;
-        $form['main'][$entity_type][$section_key]['weight'] = array(
-          '#type' => 'textfield',
-          '#attributes' => array(
-            'class' => array($weight_class),
-          ),
-          '#default_value' => $section['weight'],
-        );
-        $form['main'][$entity_type][$section_key]['enabled'] = array(
-          '#type' => 'checkbox',
-          '#title' => 'enabled',
-          '#default_value' => $section['enabled'],
-        );
-      }
-    }
+  foreach (_entity_state_block_get_info() as $section_key => $section) {
+    $form['configuration'][$section_key]['#entity_state'] = $section;
+    $form['configuration'][$section_key]['#weight_class'] = $weight_class;
+    $form['configuration'][$section_key]['weight'] = array(
+      '#type' => 'textfield',
+      '#attributes' => array(
+        'class' => array($weight_class),
+      ),
+      '#default_value' => $section['weight'],
+    );
+    $form['configuration'][$section_key]['enabled'] = array(
+      '#type' => 'checkbox',
+      '#title' => 'enabled',
+      '#default_value' => $section['enabled'],
+    );
   }
   return $form;
 }
 
 /**
- * Pre-render callback for the main fieldset of the block configuration form.
+ * Pre-render callback for the fieldset of the block configuration form.
  *
  * Converts contents of the child fieldsets to draggable tables.
  */
@@ -87,7 +74,7 @@ function entity_state_block_configure_form_pre_render($element) {
     );
     unset($element[$key]);
   };
-  $table_id = drupal_html_id('entity-state-block-table-' . $element['#entity_type']);
+  $table_id = drupal_html_id('entity-state-block-configuration-table');
   $element['table'] = array(
     '#theme' => 'table',
     '#header' => $element['#table_header'],

@@ -55,14 +55,14 @@ function _entity_state_block_get_currently_viewed_entity() {
 function _entity_state_block_get_entity_state($entity_type, $entity) {
   $entity_state_info = _entity_state_block_get_info();
   $enabled_sections = array();
-  foreach ($entity_state_info[$entity_type] as $section_key => $section) {
+  foreach ($entity_state_info as $section_key => $section) {
     if ($section['enabled']) {
       $enabled_sections[] = $section_key;
     }
   }
   $data = module_invoke_all('entity_state_block_view', $entity_type, $entity, $enabled_sections);
   // Sort by weight.
-  $data = array_filter(array_merge(array_flip(array_keys($entity_state_info[$entity_type])), $data), 'is_array');
+  $data = array_filter(array_merge(array_flip(array_keys($entity_state_info)), $data), 'is_array');
   if (empty($data)) {
     return NULL;
   }
@@ -126,25 +126,20 @@ function _entity_state_block_get_info() {
   module_load_include('contrib.inc', 'entity_state_block');
   $settings = variable_get('entity_state_block_settings', array());
   $info = module_invoke_all('entity_state_block_info');
-  foreach ($info as $entity_type => $data) {
-    foreach ($data as $section_key => $section) {
-      // Fill with default values.
-      $info[$entity_type][$section_key] += array(
-        'weight' => 0,
-        'enabled' => FALSE,
-      );
-      // Override with user provided values if any.
-      foreach (array('weight', 'enabled') as $setting_key) {
-        if (isset($settings[$entity_type][$section_key][$setting_key])) {
-          $info[$entity_type][$section_key][$setting_key] = $settings[$entity_type][$section_key][$setting_key];
-        }
+  foreach ($info as $section_key => $section) {
+    // Fill with default values.
+    $info[$section_key] += array(
+      'weight' => 0,
+      'enabled' => FALSE,
+    );
+    // Override with user provided values if any.
+    foreach (array('weight', 'enabled') as $setting_key) {
+      if (isset($settings[$section_key][$setting_key])) {
+        $info[$section_key][$setting_key] = $settings[$section_key][$setting_key];
       }
     }
   }
   drupal_alter('entity_state_block_info', $info);
-  foreach ($info as $entity_type => &$data) {
-    uasort($data, 'drupal_sort_weight');
-  }
-  unset($data);
+  uasort($info, 'drupal_sort_weight');
   return $info;
 }

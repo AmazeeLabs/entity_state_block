@@ -1,21 +1,22 @@
 <?php
 
+//AXXX remove entity type
+//AXXX add hook_alter desc
+
 /**
- * Defines entity state sections grouped by entity types.
+ * Defines entity state sections.
  *
  * @return array
  *   See code for array structure.
  */
 function hook_entity_state_block_info() {
   return array(
-    'node' => array( // Entity type.
-      'node_status' => array( // Section machine name.
-        'title' => t('Content status'), // Title showed on the configuration page.
-        'description' => t('Whether a node is published or not.'), // Description for the configuration page.
-        // The following properties are optional and can be overridden by user.
-        'weight' => -100, // Default: 0
-        'enabled' => TRUE, // Default: FALSE
-      ),
+    'node_status' => array( // Section machine name.
+      'title' => t('Content status'), // Title showed on the configuration page.
+      'description' => t('Whether a node is published or not.'), // Description for the configuration page.
+      // The following properties are optional and can be overridden by user.
+      'weight' => -100, // Default: 0
+      'enabled' => TRUE, // Default: FALSE
     ),
   );
 }

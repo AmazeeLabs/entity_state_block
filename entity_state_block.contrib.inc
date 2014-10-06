@@ -5,7 +5,7 @@
  * Default implementations of the entity_state_block hooks.
  */
 
-// @todo: more implementations: panelizer state, revisions, last node update by, translations state, etc.
+// @todo: more implementations: entity type/bundle, revisions, last node update by, translations state, etc.
 
 if (!function_exists('node_entity_state_block_info')) {
 
@@ -14,17 +14,15 @@ if (!function_exists('node_entity_state_block_info')) {
    */
   function node_entity_state_block_info() {
     return array(
-      'node' => array(
-        'node_status' => array(
-          'title' => t('Content status'),
-          'description' => t('Whether a node is published or not.'),
-          'weight' => -100,
-          'enabled' => TRUE,
-        ),
-        'node_author' => array(
-          'title' => t('Content author'),
-          'description' => t('The value of the "Authored by" content property.'),
-        ),
+      'node_status' => array(
+        'title' => t('Content status'),
+        'description' => t('Whether a node is published or not.'),
+        'weight' => -100,
+        'enabled' => TRUE,
+      ),
+      'node_author' => array(
+        'title' => t('Content author'),
+        'description' => t('The value of the "Authored by" content property.'),
       ),
     );
   }
@@ -40,7 +38,7 @@ if (!function_exists('node_entity_state_block_view')) {
     if ($entity_type == 'node') {
       if (in_array('node_status', $enabled_sections)) {
         $return['node_status'] = array(
-          'title' => t('Status'),
+          'title' => t('Content status'),
           'value' => $entity->status == NODE_PUBLISHED ? t('Published') : t('Unpublished'),
         );
       }
@@ -62,11 +60,9 @@ if (!function_exists('domain_entity_state_block_info')) {
    */
   function domain_entity_state_block_info() {
     return array(
-      'node' => array(
-        'domains' => array(
-          'title' => t('Domains'),
-          'description' => t('Assigned node domains.'),
-        ),
+      'domains' => array(
+        'title' => t('Domains'),
+        'description' => t('Assigned node domains.'),
       ),
     );
   }
@@ -108,11 +104,9 @@ if (!function_exists('panelizer_entity_state_block_info')) {
    */
   function panelizer_entity_state_block_info() {
     return array(
-      'node' => array(
-        'panelizer' => array(
-          'title' => t('Panelizer'),
-          'description' => t('Overall panelizer state for the current entity and/or current state of the "Full page override" (page_manager) view mode.'),
-        ),
+      'panelizer' => array(
+        'title' => t('Panelizer'),
+        'description' => t('Overall panelizer state for the current entity and/or current state of the "Full page override" (page_manager) view mode.'),
       ),
     );
   }
@@ -127,7 +121,7 @@ if (!function_exists('panelizer_entity_state_block_view')) {
     $return = array();
     if (in_array('panelizer', $enabled_sections)) {
       $enabled = FALSE;
-      //
+      // Parsing of HTML is not the best way to get info... But it works.
       $overview = panelizer_entity_plugin_switcher_page($entity_type, 'overview', $entity);
       if ($overview) {
         $doc = new DOMDocument();
