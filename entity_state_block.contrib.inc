@@ -5,7 +5,7 @@
  * Default implementations of the entity_state_block hooks.
  */
 
-// @todo: more implementations: entity type/bundle, revisions, last node update by, translations state, etc.
+// @todo: more implementations: entity type/bundle, revisions, last node update by, languages/translations state, etc.
 
 if (!function_exists('node_entity_state_block_info')) {
 
